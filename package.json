@@ -1,0 +1,21 @@
+{
+  "name": "blog-fullstack-backend",
+  "version": "1.0.0",
+  "description": "Repositório para Backend para projeto da Mind Group",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lupateli/blog-fullstack-backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Lupateli/blog-fullstack-backend/issues"
+  },
+  "homepage": "https://github.com/Lupateli/blog-fullstack-backend#readme"
+}
