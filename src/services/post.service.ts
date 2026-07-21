@@ -17,23 +17,32 @@ export class PostService {
 
   async findAll() {
     return prisma.post.findMany({
-      include: {
+        include: {
         author: {
-          select: {
+            select: {
             id: true,
             name: true,
-          },
+            },
         },
-      },
+        },
+
+        orderBy: {
+        createdAt: "desc",
+        },
     });
   }
 
   async findById(id: number) {
     return prisma.post.findUnique({
-      where: { id },
-      include: {
-        author: true,
-      },
+        where: { id },
+        include: {
+            author: {
+                select: {
+                id: true,
+                name: true,
+                },
+            },
+        }
     });
   }
 
