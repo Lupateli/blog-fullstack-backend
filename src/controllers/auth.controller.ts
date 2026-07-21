@@ -28,4 +28,15 @@ export class AuthController {
         });
     }
     }
+    async me(req: Request, res: Response) {
+      try {
+          const user = await authService.me(req.userId);
+  
+          return res.json(user);
+      } catch (error) {
+          return res.status(400).json({
+          message: error instanceof Error ? error.message : "Erro interno",
+          });
+      }
+    }
 }

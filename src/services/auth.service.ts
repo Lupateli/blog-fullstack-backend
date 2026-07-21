@@ -64,4 +64,19 @@ export class AuthService {
         token,
     };
     }
+  async me(userId: number) {
+    const user = await prisma.user.findUnique({
+        where: {
+        id: userId,
+        },
+        select: {
+        id: true,
+        name: true,
+        email: true,
+        },
+    });
+
+    return user;
+    }
 }
+
