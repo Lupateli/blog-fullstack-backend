@@ -5,7 +5,7 @@ interface TokenPayload {
   id: number;
 }
 
-export function verifyToken(
+export function optionalAuth(
   req: Request,
   res: Response,
   next: NextFunction
@@ -13,17 +13,13 @@ export function verifyToken(
   const authorization = req.headers.authorization;
 
   if (!authorization) {
-    return res.status(401).json({
-      message: "Token não informado",
-    });
+    return next();
   }
 
-  const [type, token] = authorization.split(" ");
+  const [, token] = authorization.split(" ");
 
-  if (type !== "Bearer" || !token) {
-    return res.status(401).json({
-      message: "Token inválido",
-    });
+  if (!token) {
+    return next();
   }
 
   try {
@@ -33,11 +29,9 @@ export function verifyToken(
     ) as TokenPayload;
 
     req.userId = decoded.id;
-
-    return next();
   } catch {
-    return res.status(401).json({
-      message: "Token inválido ou expirado",
-    });
+    // A rota continua pública mesmo que o token seja inválido.
   }
+
+  return next();
 }

@@ -76,6 +76,10 @@ export class AuthService {
         },
     });
 
+    if (!user) {
+      throw new Error("Usuário não encontrado");
+    }
+
     return user;
     }
 }

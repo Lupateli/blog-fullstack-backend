@@ -30,6 +30,10 @@ export class AuthController {
     }
     async me(req: Request, res: Response) {
       try {
+          if (!req.userId) {
+            return res.status(401).json({ message: "Token não informado" });
+          }
+
           const user = await authService.me(req.userId);
   
           return res.json(user);
