@@ -37,16 +37,45 @@ export class PostService {
     });
   }
 
-  async update(id: number, data: Partial<CreatePostData>) {
-    return prisma.post.update({
-      where: { id },
-      data,
-    });
-  }
 
-  async delete(id: number) {
-    return prisma.post.delete({
-      where: { id },
+  async update(
+    id: number,
+    userId: number,
+    data: Partial<CreatePostData>
+    ) {
+    const post = await prisma.post.findUnique({
+        where: { id },
     });
-  }
+
+    if (!post) {
+        throw new Error("Post não encontrado.");
+    }
+
+    if (post.authorId !== userId) {
+        throw new Error("Não autorizado.");
+    }
+
+    return prisma.post.update({
+        where: { id },
+        data,
+    });
+    }
+
+  async delete(id: number, userId: number) {
+    const post = await prisma.post.findUnique({
+        where: { id },
+    });
+
+    if (!post) {
+        throw new Error("Post não encontrado.");
+    }
+
+    if (post.authorId !== userId) {
+        throw new Error("Não autorizado.");
+    }
+
+    return prisma.post.delete({
+        where: { id },
+    });
+    }
 }

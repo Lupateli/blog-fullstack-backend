@@ -45,29 +45,38 @@ export class PostController {
     }
   }
 
-  async update(req: Request, res: Response) {
-    try {
-      const id = Number(req.params.id);
-      const post = await postService.update(id, req.body);
+ async update(req: Request, res: Response) {
+  try {
+    const id = Number(req.params.id);
 
-      return res.json(post);
-    } catch (error) {
-      return res.status(400).json({
-        message: error instanceof Error ? error.message : "Erro interno",
-      });
-    }
+    const post = await postService.update(
+      id,
+      req.userId,
+      req.body
+    );
+
+    return res.json(post);
+  } catch (error) {
+    return res.status(400).json({
+      message: error instanceof Error ? error.message : "Erro interno",
+    });
   }
+}
 
-  async delete(req: Request, res: Response) {
+ async delete(req: Request, res: Response) {
     try {
-      const id = Number(req.params.id);
-      await postService.delete(id);
+        const id = Number(req.params.id);
 
-      return res.status(204).send();
+        await postService.delete(
+        id,
+        req.userId
+        );
+
+        return res.status(204).send();
     } catch (error) {
-      return res.status(400).json({
+        return res.status(400).json({
         message: error instanceof Error ? error.message : "Erro interno",
-      });
+        });
     }
-  }
+    }
 }
