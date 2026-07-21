@@ -87,4 +87,41 @@ export class PostService {
         where: { id },
     });
     }
+    async incrementView(id: number) {
+  const post = await prisma.post.findUnique({
+    where: { id },
+  });
+
+  if (!post) {
+    throw new Error("Post não encontrado");
+  }
+
+  return prisma.post.update({
+    where: { id },
+    data: {
+      views: {
+        increment: 1,
+      },
+    },
+  });
+}
+
+async incrementLike(id: number) {
+  const post = await prisma.post.findUnique({
+    where: { id },
+  });
+
+  if (!post) {
+    throw new Error("Post não encontrado");
+  }
+
+  return prisma.post.update({
+    where: { id },
+    data: {
+      likes: {
+        increment: 1,
+      },
+    },
+  });
+}
 }
