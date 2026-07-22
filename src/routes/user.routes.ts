@@ -1,5 +1,5 @@
 import { Router } from "express";
-
+import { upload } from "../config/upload";
 import { UserController } from "../controllers/user.controller";
 import { verifyToken } from "../middlewares/auth.middleware";
 
@@ -16,8 +16,8 @@ router.get(
 router.put(
   "/me",
   verifyToken,
-  (req, res) =>
-    controller.updateProfile(req, res),
+  upload.single("avatar"),
+  (req, res) => controller.updateProfile(req, res)
 );
 
 export default router;

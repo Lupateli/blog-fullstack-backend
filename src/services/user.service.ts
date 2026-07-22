@@ -49,15 +49,20 @@ export class UserService {
       throw new Error("Usuário não encontrado.");
     }
 
+    const normalizedEmail =
+      data.email !== undefined
+        ? data.email.trim().toLowerCase()
+        : undefined;
+
     if (
-      data.email &&
-      data.email.toLowerCase() !==
+      normalizedEmail &&
+      normalizedEmail !==
         existingUser.email.toLowerCase()
     ) {
       const emailAlreadyExists =
         await prisma.user.findUnique({
           where: {
-            email: data.email,
+            email: normalizedEmail,
           },
           select: {
             id: true,
@@ -65,11 +70,13 @@ export class UserService {
         });
 
       if (emailAlreadyExists) {
-        throw new Error("Este e-mail já está em uso.");
+        throw new Error(
+          "Este e-mail já está em uso.",
+        );
       }
     }
 
-    return prisma.user.update({
+    const updatedUser = await prisma.user.update({
       where: {
         id: userId,
       },
@@ -79,21 +86,23 @@ export class UserService {
               name: data.name.trim(),
             }
           : {}),
-        ...(data.email !== undefined
+
+        ...(normalizedEmail !== undefined
           ? {
-              email: data.email
-                .trim()
-                .toLowerCase(),
+              email: normalizedEmail,
             }
           : {}),
+
         ...(data.bio !== undefined
           ? {
               bio: data.bio?.trim() || null,
             }
           : {}),
+
         ...(data.avatar !== undefined
           ? {
-              avatar: data.avatar?.trim() || null,
+              avatar:
+                data.avatar?.trim() || null,
             }
           : {}),
       },
@@ -107,5 +116,7 @@ export class UserService {
         createdAt: true,
       },
     });
+
+    return updatedUser;
   }
 }

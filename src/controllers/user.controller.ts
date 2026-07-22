@@ -30,7 +30,7 @@ export class UserController {
     try {
       if (!req.userId) {
         return res.status(401).json({
-          message: "Token não informado.",
+          message: "Usuário não autenticado.",
         });
       }
 
@@ -38,7 +38,7 @@ export class UserController {
         req.userId,
       );
 
-      return res.json(user);
+      return res.status(200).json(user);
     } catch (error) {
       return getErrorResponse(res, error);
     }
@@ -51,39 +51,40 @@ export class UserController {
     try {
       if (!req.userId) {
         return res.status(401).json({
-          message: "Token não informado.",
+          message: "Usuário não autenticado.",
         });
       }
 
+      const body = req.body ?? {};
+
       const name =
-        typeof req.body.name === "string"
-          ? req.body.name.trim()
+        typeof body.name === "string"
+          ? body.name.trim()
           : undefined;
 
       const email =
-        typeof req.body.email === "string"
-          ? req.body.email.trim()
+        typeof body.email === "string"
+          ? body.email.trim().toLowerCase()
           : undefined;
 
       const bio =
-        typeof req.body.bio === "string"
-          ? req.body.bio
+        typeof body.bio === "string"
+          ? body.bio.trim()
           : undefined;
 
-      const avatar =
-        typeof req.body.avatar === "string"
-          ? req.body.avatar
-          : undefined;
+      const avatar = req.file
+        ? `/uploads/avatars/${req.file.filename}`
+        : undefined;
 
       if (name !== undefined && !name) {
         return res.status(400).json({
-          message: "Informe o nome.",
+          message: "Informe o nome completo.",
         });
       }
 
       if (
         email !== undefined &&
-        !email.includes("@")
+        (!email || !email.includes("@"))
       ) {
         return res.status(400).json({
           message: "Informe um e-mail válido.",
@@ -100,18 +101,20 @@ export class UserController {
         });
       }
 
-      const updatedUser =
+     const profileData = {
+        ...(name !== undefined ? { name } : {}),
+        ...(email !== undefined ? { email } : {}),
+        ...(bio !== undefined ? { bio } : {}),
+        ...(avatar !== undefined ? { avatar } : {}),
+        };
+
+        const updatedUser =
         await userService.updateProfile(
-          req.userId,
-          {
-            name,
-            email,
-            bio,
-            avatar,
-          },
+            req.userId,
+            profileData,
         );
 
-      return res.json(updatedUser);
+      return res.status(200).json(updatedUser);
     } catch (error) {
       return getErrorResponse(res, error);
     }
