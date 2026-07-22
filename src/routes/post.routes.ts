@@ -9,8 +9,7 @@ import { optionalAuth } from "../middlewares/optionalAuth.middleware";
 const router = Router();
 
 const controller = new PostController();
-const commentController =
-  new CommentController();
+const commentController = new CommentController();
 
 // Criar post
 router.post(
@@ -20,7 +19,15 @@ router.post(
   (req, res) => controller.create(req, res),
 );
 
-// Listar posts
+// Dashboard do usuário autenticado.
+// Precisa ficar antes de "/:id".
+router.get(
+  "/dashboard",
+  verifyToken,
+  (req, res) => controller.dashboard(req, res),
+);
+
+// Listar posts públicos
 router.get(
   "/",
   optionalAuth,

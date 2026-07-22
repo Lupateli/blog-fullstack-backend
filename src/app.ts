@@ -5,6 +5,7 @@ import postRoutes from "./routes/post.routes";
 import path from "path";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./config/swagger";
+import userRoutes from "./routes/user.routes";
 
 
 const app = express();
@@ -19,5 +20,6 @@ app.use(
   express.static(path.resolve("uploads"))
 );
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use("/users", userRoutes);
 
 export default app;

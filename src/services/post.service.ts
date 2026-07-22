@@ -10,24 +10,41 @@ interface CreatePostData {
   authorId: number;
 }
 
+interface UpdatePostData {
+  title?: string;
+  summary?: string;
+  content?: string;
+  category?: string;
+  tags?: string[];
+  banner?: string;
+}
+
 export class PostService {
   async create(data: CreatePostData) {
     return prisma.post.create({
-        data: {
+      data: {
         title: data.title,
         content: data.content,
-        ...(data.summary ? { summary: data.summary } : {}),
-        ...(data.category ? { category: data.category } : {}),
-        ...(data.tags?.length ? { tags: JSON.stringify(data.tags) } : {}),
-        ...(data.banner ? { banner: data.banner } : {}),
+        ...(data.summary
+          ? { summary: data.summary }
+          : {}),
+        ...(data.category
+          ? { category: data.category }
+          : {}),
+        ...(data.tags
+          ? { tags: JSON.stringify(data.tags) }
+          : {}),
+        ...(data.banner
+          ? { banner: data.banner }
+          : {}),
         author: {
-            connect: {
+          connect: {
             id: data.authorId,
-            },
+          },
         },
-        },
+      },
     });
-    }
+  }
 
   async findAll(userId?: number) {
     const posts = await prisma.post.findMany({
@@ -41,6 +58,7 @@ export class PostService {
         _count: {
           select: {
             likes: true,
+            comments: true,
           },
         },
         likes: {
@@ -57,11 +75,69 @@ export class PostService {
       },
     });
 
-    return posts.map(({ _count, likes, ...post }) => ({
-      ...post,
-      likesCount: _count.likes,
-      likedByCurrentUser: likes.length > 0,
-    }));
+    return posts.map(
+      ({ _count, likes, ...post }) => ({
+        ...post,
+        likesCount: _count.likes,
+        commentsCount: _count.comments,
+        likedByCurrentUser: likes.length > 0,
+      }),
+    );
+  }
+
+  async findDashboard(userId: number) {
+    const posts = await prisma.post.findMany({
+      where: {
+        authorId: userId,
+      },
+      include: {
+        _count: {
+          select: {
+            likes: true,
+            comments: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    const recentComments =
+      await prisma.comment.findMany({
+        where: {
+          post: {
+            authorId: userId,
+          },
+        },
+        include: {
+          author: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          post: {
+            select: {
+              id: true,
+              title: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 5,
+      });
+
+    return {
+      posts: posts.map(({ _count, ...post }) => ({
+        ...post,
+        likesCount: _count.likes,
+        commentsCount: _count.comments,
+      })),
+      recentComments,
+    };
   }
 
   async findById(id: number, userId?: number) {
@@ -79,6 +155,7 @@ export class PostService {
         _count: {
           select: {
             likes: true,
+            comments: true,
           },
         },
         likes: {
@@ -101,11 +178,16 @@ export class PostService {
     return {
       ...postData,
       likesCount: _count.likes,
+      commentsCount: _count.comments,
       likedByCurrentUser: likes.length > 0,
     };
   }
 
-  async update(id: number, userId: number, data: Partial<CreatePostData>) {
+  async update(
+    id: number,
+    userId: number,
+    data: UpdatePostData,
+  ) {
     const post = await prisma.post.findUnique({
       where: { id },
     });
@@ -118,11 +200,28 @@ export class PostService {
       throw new Error("Não autorizado.");
     }
 
-    const { authorId, ...rest } = data;
-
     return prisma.post.update({
       where: { id },
-      data: rest,
+      data: {
+        ...(data.title !== undefined
+          ? { title: data.title.trim() }
+          : {}),
+        ...(data.summary !== undefined
+          ? { summary: data.summary.trim() }
+          : {}),
+        ...(data.content !== undefined
+          ? { content: data.content.trim() }
+          : {}),
+        ...(data.category !== undefined
+          ? { category: data.category }
+          : {}),
+        ...(data.tags !== undefined
+          ? { tags: JSON.stringify(data.tags) }
+          : {}),
+        ...(data.banner !== undefined
+          ? { banner: data.banner }
+          : {}),
+      },
     });
   }
 
@@ -145,10 +244,11 @@ export class PostService {
   }
 
   async incrementView(id: number) {
-    const postExists = await prisma.post.findUnique({
-      where: { id },
-      select: { id: true },
-    });
+    const postExists =
+      await prisma.post.findUnique({
+        where: { id },
+        select: { id: true },
+      });
 
     if (!postExists) {
       throw new Error("Post não encontrado");
@@ -165,10 +265,11 @@ export class PostService {
   }
 
   async like(id: number, userId: number) {
-    const postExists = await prisma.post.findUnique({
-      where: { id },
-      select: { id: true },
-    });
+    const postExists =
+      await prisma.post.findUnique({
+        where: { id },
+        select: { id: true },
+      });
 
     if (!postExists) {
       throw new Error("Post não encontrado");
@@ -204,7 +305,9 @@ export class PostService {
     });
 
     if (!like) {
-      throw new Error("Este post ainda não foi curtido");
+      throw new Error(
+        "Este post ainda não foi curtido",
+      );
     }
 
     await prisma.like.delete({
