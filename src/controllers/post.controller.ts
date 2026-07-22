@@ -22,13 +22,19 @@ export class PostController {
         return res.status(401).json({ message: "Token não informado" });
       }
 
-      const payload = {
+      const tags = req.body.tags
+        ? JSON.parse(req.body.tags)
+        : [];
+
+        const payload = {
         title: req.body.title,
+        summary: req.body.summary,
         content: req.body.content,
         category: req.body.category,
+        tags,
         authorId: req.userId,
         ...(req.file?.filename ? { banner: req.file.filename } : {}),
-      };
+        };
 
       const post = await postService.create(payload);
 

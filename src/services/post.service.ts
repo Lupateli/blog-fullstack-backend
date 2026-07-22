@@ -2,8 +2,10 @@ import prisma from "../config/prisma";
 
 interface CreatePostData {
   title: string;
+  summary?: string;
   content: string;
   category?: string;
+  tags?: string[];
   banner?: string;
   authorId: number;
 }
@@ -11,19 +13,21 @@ interface CreatePostData {
 export class PostService {
   async create(data: CreatePostData) {
     return prisma.post.create({
-      data: {
+        data: {
         title: data.title,
         content: data.content,
+        ...(data.summary ? { summary: data.summary } : {}),
         ...(data.category ? { category: data.category } : {}),
+        ...(data.tags?.length ? { tags: JSON.stringify(data.tags) } : {}),
         ...(data.banner ? { banner: data.banner } : {}),
         author: {
-          connect: {
+            connect: {
             id: data.authorId,
-          },
+            },
         },
-      },
+        },
     });
-  }
+    }
 
   async findAll(userId?: number) {
     const posts = await prisma.post.findMany({

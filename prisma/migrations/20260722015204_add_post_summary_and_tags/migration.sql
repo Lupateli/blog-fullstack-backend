@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE `post` ADD COLUMN `summary` VARCHAR(191) NULL,
+    ADD COLUMN `tags` VARCHAR(191) NULL;
