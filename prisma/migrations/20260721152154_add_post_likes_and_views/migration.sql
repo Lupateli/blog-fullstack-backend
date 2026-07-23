@@ -5,7 +5,7 @@
 
 */
 -- AlterTable
-ALTER TABLE `post` DROP COLUMN `likes`;
+ALTER TABLE `Post` DROP COLUMN `likes`;
 
 -- CreateTable
 CREATE TABLE `Like` (

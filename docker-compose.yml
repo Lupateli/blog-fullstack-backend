@@ -1,0 +1,60 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mind-group-mysql
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+    ports:
+      - "3307:3306"
+
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          'mysqladmin ping -h 127.0.0.1 -u root -p"$${MYSQL_ROOT_PASSWORD}" --silent',
+        ]
+      interval: 5s
+      timeout: 10s
+      retries: 30
+      start_period: 240s
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: mind-group-backend
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    ports:
+      - "3000:3000"
+
+    volumes:
+      - avatar_uploads:/app/uploads
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+    command: >
+      sh -c "npx prisma migrate deploy &&
+             npm start"
+
+volumes:
+  mysql_data:
+  avatar_uploads:

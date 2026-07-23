@@ -1,3 +1,3 @@
 -- AlterTable
-ALTER TABLE `post` ADD COLUMN `summary` VARCHAR(191) NULL,
+ALTER TABLE `Post` ADD COLUMN `summary` VARCHAR(191) NULL,
     ADD COLUMN `tags` VARCHAR(191) NULL;
