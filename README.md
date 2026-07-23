@@ -1,90 +1,40 @@
 # Mind Group - Backend
 
-Backend da plataforma **Mind Group**, um sistema de publicação de artigos desenvolvido com Node.js, Express, TypeScript e Prisma.
+Backend desenvolvido para o Case Técnico da Mind Group.
 
-A API fornece autenticação JWT, gerenciamento de usuários, artigos, comentários, curtidas, visualizações e upload de imagens de perfil.
+API REST responsável pela autenticação, gerenciamento de usuários, posts, comentários e upload de avatar.
 
 ---
 
 ## Tecnologias
 
 - Node.js
-- Express
 - TypeScript
+- Express
 - Prisma ORM
 - MySQL
-- JWT Authentication
+- JWT
 - Bcrypt
 - Multer
 - Swagger
-- Vitest
+- Docker
+- Docker Compose
 
 ---
 
 ## Funcionalidades
 
-### Autenticação
-
 - Cadastro de usuários
 - Login com JWT
-- Proteção de rotas
-- Middleware de autenticação
-
-### Perfil
-
-- Atualização de nome
-- Atualização de e-mail
-- Atualização da biografia
+- Perfil do usuário
+- Atualização de perfil
 - Upload de avatar
-- Consulta do usuário autenticado
-
-### Artigos
-
-- Criar artigo
-- Editar artigo
-- Excluir artigo
-- Listar artigos
-- Buscar artigo por ID
-
-### Comentários
-
-- Criar comentários
-- Listar comentários por artigo
-- Excluir comentários
-
-### Curtidas
-
-- Curtir artigos
-- Remover curtidas
-
-### Visualizações
-
-- Contador automático de visualizações
-
-### Dashboard
-
-- Estatísticas do usuário
-- Quantidade de artigos
-- Curtidas recebidas
+- CRUD completo de Posts
+- Sistema de Comentários
+- Curtidas
 - Visualizações
-
----
-
-## Estrutura
-
-```
-src
-│
-├── config
-├── controllers
-├── middlewares
-├── prisma
-├── routes
-├── services
-├── types
-├── utils
-└── server.ts
-```
+- Dashboard do usuário
+- Documentação Swagger
 
 ---
 
@@ -93,7 +43,7 @@ src
 Clone o projeto
 
 ```bash
-git clone https://github.com/Lupateli/blog-fullstack-backend.git
+git clone https://github.com/SEU_USUARIO/blog-fullstack-backend.git
 ```
 
 Entre na pasta
@@ -108,83 +58,72 @@ Instale as dependências
 npm install
 ```
 
-Configure o arquivo `.env`
+Crie o arquivo
+
+```text
+.env
+```
+
+Baseado no arquivo
+
+```text
+.env.example
+```
+
+Execute
+
+```bash
+npx prisma generate
+npx prisma migrate dev
+npm run dev
+```
+
+---
+
+# Executando com Docker
+
+Construir os containers
+
+```bash
+docker compose up --build
+```
+
+Executar em segundo plano
+
+```bash
+docker compose up -d
+```
+
+Parar
+
+```bash
+docker compose down
+```
+
+---
+
+## Variáveis de ambiente
+
+Exemplo:
 
 ```env
-DATABASE_URL=
-JWT_SECRET=
 PORT=3000
-```
 
-Execute as migrations
+DATABASE_URL=mysql://mindgroup:123456@mysql:3306/blog_db
 
-```bash
-npx prisma migrate dev
-```
+JWT_SECRET=your_secret
 
-Execute o projeto
-
-```bash
-npm run dev
-```
-
----
-
-## Scripts
-
-```bash
-npm run dev
-```
-
-Inicia o servidor em desenvolvimento.
-
-```bash
-npm run build
-```
-
-Compila o projeto.
-
-```bash
-npm start
-```
-
-Executa a versão compilada.
-
-```bash
-npm run typecheck
-```
-
-Verifica erros de TypeScript.
-
-```bash
-npm test
-```
-
-Executa os testes.
-
----
-
-## Upload de arquivos
-
-Os avatares enviados são armazenados em
-
-```
-uploads/avatars
-```
-
-e disponibilizados através de
-
-```
-/uploads/avatars/nome-do-arquivo.ext
+MYSQL_ROOT_PASSWORD=root
+MYSQL_DATABASE=blog_db
+MYSQL_USER=mindgroup
+MYSQL_PASSWORD=123456
 ```
 
 ---
 
 ## Documentação
 
-A API possui documentação utilizando Swagger.
-
-Após iniciar o servidor, acesse:
+Após iniciar o projeto:
 
 ```
 http://localhost:3000/api-docs
@@ -192,17 +131,22 @@ http://localhost:3000/api-docs
 
 ---
 
-## Próximas melhorias
+## Estrutura
 
-- Recuperação de senha
-- Alteração de senha
-- Upload de banner dos artigos
-- Paginação
-- Sistema de tags
-- Categorias relacionais
+```
+src
+│
+├── controllers
+├── middleware
+├── routes
+├── services
+├── prisma
+├── uploads
+└── server.ts
+```
 
 ---
 
-## Autor
+## Desenvolvedor
 
-Desenvolvido por **Gabriel Lupateli**
+Gabriel Lupateli
